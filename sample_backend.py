@@ -1,93 +1,84 @@
-from flask import Flask
-from flask import request
-from flask import jsonify
+from flask import Flask, request, jsonify
 from flask_cors import CORS
-import random
-import string
-from model_mongodb import User
-
+from random_username.generate import generate_username
 
 app = Flask(__name__)
-
-#CORS stands for Cross Origin Requests.
-CORS(app) #Here we'll allow requests coming from any domain. Not recommended for production environment.
+CORS(app)
 
 users = { 
-    'users_list' :
-    [
-        {  
-            'id' : 'xyz789',
-            'name' : 'Charlie',
-            'job': 'Janitor',
-        },
-        {
-            'id' : 'abc123',            
-            'name': 'Mac',
-            'job': 'Bouncer',
-        },
-        {
-            'id' : 'ppp222',            
-            'name': 'Mac',
-            'job': 'Professor',
-        },        
-        {
-            'id' : 'yat999',            
-            'name': 'Dee',
-            'job': 'Aspring actress',
-        },
-        {
-             'id' : 'zap555',           
-            'name': 'Dennis',
-            'job': 'Bartender',
-        }
-    ]
+   'users_list':
+   [
+      { 
+         'id' : 'xyz789',
+         'name' : 'Charlie',
+         'job': 'Janitor',
+      },
+      {
+         'id' : 'abc123', 
+         'name': 'Mac',
+         'job': 'Bouncer',
+      },
+      {
+         'id' : 'ppp222', 
+         'name': 'Mac',
+         'job': 'Professor',
+      }, 
+      {
+         'id' : 'yat999', 
+         'name': 'Dee',
+         'job': 'Aspring actress',
+      },
+      {
+         'id' : 'zap555', 
+         'name': 'Dennis',
+         'job': 'Bartender',
+      }
+   ]
 }
 
 @app.route('/')
 def hello_world():
-    return 'Hello, World!'
+    return 'Hello world!'
 
 @app.route('/users', methods=['GET', 'POST'])
 def get_users():
     if request.method == 'GET':
         search_username = request.args.get('name')
         search_job = request.args.get('job')
+
+        if not (search_username or search_job):
+            return users 
+
         if search_username and search_job:
-            # TODO: Replace with database access
-            result = find_users_by_name_job(search_username, search_job)  
+            filtered = filter(lambda c: c['name'] == search_username and c['job'] == search_job, users['users_list'])
+            return { 'users_list': filtered }
         elif search_username:
-            # using list shorthand for filtering the list.
-            # TODO: Replace with database access
-            result = [user for user in users['users_list'] if user['name'] == search_username]
-        else:
-            result = User().find_all()
-        return {"users_list": result}
+            filtered = find_users_by_name(search_username)
+            return { 'users_list': filtered }
+        elif search_job:
+            filtered = filter(lambda c: c['job'] == search_job, users['users_list'])
+            return { 'users_list': filtered }
     elif request.method == 'POST':
-        userToAdd = request.get_json() # no need to generate an id ourselves
-        newUser = User(userToAdd)
-        newUser.save() # pymongo gives the record an "_id" field automatically
-        resp = jsonify(newUser), 201
-        return resp
+        userToAdd = request.get_json()
+        userToAdd['id'] = generate_username()[0]
+        users['users_list'].append(userToAdd)
+        return userToAdd, 201
 
 @app.route('/users/<id>', methods=['GET', 'DELETE'])
 def get_user(id):
     if request.method == 'GET':
-        user = User({"_id":id})
-        if user.reload() :
-            return user
-        else :
-            return jsonify({"error": "User not found"}), 404
+        if id:
+            for user in users['users_list']:
+                if user['id'] == id:
+                    return user
+                return ({})
     elif request.method == 'DELETE':
-        user = User({"_id":id})
-        resp = user.remove()
+        if id in map(lambda a: a['id'], users['users_list']): # does the id exist in the lis
+            users['users_list'] = list(filter(lambda a: a['id'] != id, users['users_list']))
+            return jsonify(success=True), 204
+        return jsonify(success=False), 404
+    return users
 
-        # TODO: Check the resp object if the removal was successful or not.
-        # Return a 404 status code if it was not successful
-        return {}, 204
-
-def find_users_by_name_job(name, job):
-    subdict = {'users_list' : []}
-    for user in users['users_list']:
-        if user['name'] == name and user['job'] == job:
-            subdict['users_list'].append(user)
-    return subdict  
+def find_users_by_name(name):
+    filtered = filter(lambda c: c['name'] == name, users['users_list'])
+    return list(filtered)
