@@ -38,7 +38,7 @@ users = {
 
 @app.route('/')
 def hello_world():
-    return 'Hello world!'
+    return 'Hello world! Test Travis-CI'
 
 @app.route('/users', methods=['GET', 'POST'])
 def get_users():
