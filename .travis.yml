@@ -6,12 +6,4 @@ install:
 - pip install -r requirements.txt
 script:
 - pytest -v *_tests.py
-deploy:
-  provider: heroku
-  api_key:
-    secure: DAcDbb+wcBZhcb4ctV8PSUE3c0F7MKT9j/RKDY1AEU5ay0hfo4C67AX8vW38XHbJaPWdNUpQQID3TfOeEC56DKmWSsHEoGMY0vtlqkUVcMC3087fHcxPAzRgMvw/KFaPvbj58f1fhNCgqJDfEjG1qnVrLEuJfnqSxcllfWsJeoPSDbaOf+E5v+fs7/00gmKngHsXMbLjyEa3GvDUMaTVUxg5lsTflwuC7B3OFhPJWHbpQ0TH7bxQkB1B5pHIqtOqTLOW8emgU8sMTHOULAusPybGQttqqSUTtIATiGHsZCZt4vHfGeHj8eaoqObWTEvry5aY8396CfWKx6BkEhExWKz7eM0Bl3kqgb0lNsXiP0fuu++LMPFIE/oUYb7ScoFsDjYPSy4YiZVhbQtXWspgaUKIReLK7c9yau03MUQrLSRxprEdK2SLVu0nKLnQHysV0sHYoWhcz4dg5C+6qPrhbTAKgHEGrXDS+leo8AhsM6c3Q1McWIWOag/luyifKac+5So1oxK9h3aTBHTONCrPoaLv8fX952fVDs2n6KeYnaYLxhIRYJbbbebld0TsZl3pLXR5MCoa+eO0lH1RvxrFMyvkGxARJ3V4gIKV5lbJ4Mc4w4I6DPsQhi/4EjC7vaLnoswFWQV0ba07VyzGvUoOueYLtCUF2XNw5EpRc1e/Gbk=
-  app: flask-playground-db-access
-  on:
-    repo: ayaankazerouni/flask-playground-db-access
-    branch: main
-  skip_cleanup: 'true'
+
